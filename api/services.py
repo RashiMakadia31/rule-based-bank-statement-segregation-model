@@ -43,7 +43,7 @@ def longest_common_subsequence(a: List[str], b: List[str]) -> List[str]:
 def promote_semantic_anchor(user_id, bankid, acname):
     history = load_history(user_id, bankid)
     rows = history[history["acname"] == acname]
-    # Only build semantic anchors from rows without account numbers
+
     rows = rows[~rows["Particulars"].astype(str).str.contains(ACCOUNT_REGEX)]
     if len(rows) < 2:
         return
@@ -61,12 +61,12 @@ def promote_semantic_anchor(user_id, bankid, acname):
         save_pickle(paths(user_id, bankid)["semantic"], semantic_map)
 
 def detect_particulars_column(df):
-    # Exact/alias match first (case-insensitive)
+   
     for col in df.columns:
         key = str(col).strip().lower()
         if key in PARTICULARS_ALIASES:
             return col
-    # Fallback: pick the most text-like column
+
     best_col, best_score = None, -1
     for col in df.columns:
         series = df[col].dropna()
