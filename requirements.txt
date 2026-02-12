@@ -4,7 +4,7 @@ djangorestframework>=3.14
 
 # File & data handling
 pandas>=2.0
-openpyxl>=3.1      # for XLSX support
+openpyxl>=3.1      
 
 # Serialization / persistence
 joblib>=1.3
