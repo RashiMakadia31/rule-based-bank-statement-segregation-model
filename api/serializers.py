@@ -3,6 +3,7 @@ from rest_framework import serializers
 class PredictSerializer(serializers.Serializer):
     user_id = serializers.CharField()
     bankid = serializers.CharField()
+    bypass_bank_validation = serializers.BooleanField(required=False, default=False)
     file = serializers.FileField()
 
 class HistoryRowSerializer(serializers.Serializer):

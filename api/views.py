@@ -38,7 +38,12 @@ class PredictAPIView(APIView):
             for chunk in v["file"].chunks(): f.write(chunk)
             
         try:
-            df = run_prediction_file(file_path, v["user_id"], v["bankid"])
+            df = run_prediction_file(
+                file_path,
+                v["user_id"],
+                v["bankid"],
+                enforce_bank_validation=not v.get("bypass_bank_validation", False),
+            )
             rows = sanitize_for_json(df.to_dict("records"))
             return Response({"upload_id": filename, "rows": rows})
         except BankValidationWarning as e:
