@@ -2,7 +2,13 @@ import os, uuid, math
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from .serializers import PredictSerializer, AutoLearnSerializer, ApproveSerializer
-from .services import run_prediction_file, append_history, learn_account_mapping, promote_semantic_anchor
+from .services import (
+    run_prediction_file,
+    append_history,
+    learn_account_mapping,
+    promote_semantic_anchor,
+    BankValidationWarning,
+)
 from .models import paths
 
 def sanitize_for_json(obj):
@@ -35,6 +41,8 @@ class PredictAPIView(APIView):
             df = run_prediction_file(file_path, v["user_id"], v["bankid"])
             rows = sanitize_for_json(df.to_dict("records"))
             return Response({"upload_id": filename, "rows": rows})
+        except BankValidationWarning as e:
+            return Response(e.result, status=409)
         except ValueError as e:
             return Response({"error": str(e)}, status=400)
         except Exception as e:
@@ -52,7 +60,12 @@ class AutoLearnAPIView(APIView):
         upload_dir = paths(v["user_id"], v["bankid"])["uploads"]
         file_path = os.path.join(upload_dir, v["upload_id"])
         
-        df = run_prediction_file(file_path, v["user_id"], v["bankid"])
+        df = run_prediction_file(
+            file_path,
+            v["user_id"],
+            v["bankid"],
+            enforce_bank_validation=False,
+        )
         rows = sanitize_for_json(df.to_dict("records"))
         return Response({"rows": rows})
 
